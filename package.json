@@ -1,23 +1,24 @@
 {
-  "name": "@swey/fractal-vue-adapter",
-  "version": "0.4.1",
-  "description": "Vue template adapter for Fractal.",
-  "main": "index.js",
+  "name": "@swey/fractal-vue-ts-adapter",
+  "version": "0.1.0",
+  "description": "Vue+Typescript template adapter for Fractal.",
+  "main": "src/adapter.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/swey/fractal-vue-adapter.git"
+    "url": "https://github.com/swey/fractal-vue-ts-adapter.git"
   },
   "author": "Sebastian Weyrauch",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/swey/fractal-vue-adapter/issues"
+    "url": "https://github.com/swey/fractal-vue-ts-adapter/issues"
   },
-  "homepage": "https://github.com/swey/fractal-vue-adapter",
+  "homepage": "https://github.com/swey/fractal-vue-ts-adapter",
   "dependencies": {
     "@frctl/fractal": "^1.0.0-rc.1",
     "babel-core": "^7.0.0-beta.51",
     "babel-preset-env": "^1.6.1",
     "path": "^0.12.7",
+    "typescript": "^3.4.1",
     "vue": "^2.5.16",
     "vue-server-renderer": "^2.5.16",
     "vue-template-compiler": "^2.5.16"

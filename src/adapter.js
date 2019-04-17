@@ -6,8 +6,7 @@ const fs = require('fs');
 const Adapter = require('@frctl/fractal').Adapter;
 const PathPlugin = require('./plugins/PathPlugin');
 const vueTemplateCompiler = require('vue-template-compiler');
-const babel = require('babel-core');
-const babelPreset = require('babel-preset-env');
+const typescript = require('typescript');
 
 const DEFAULT_PAGE_TEMPLATE = '<!DOCTYPE html>\n<!--vue-ssr-outlet-->';
 
@@ -20,16 +19,6 @@ class VueAdapter extends Adapter {
 		this._appConfig = Object.assign({}, this._app.config(), { docs: null });
 
 		Vue.use(PathPlugin, app);
-
-		this._babelOptions = Object.assign({
-			presets: [
-				[babelPreset, {
-					targets: {
-						node: 'current'
-					}
-				}]
-			]
-		}, this._config.babel);
 
 		this._vuePageRenderer = VueServerRenderer.createRenderer({
 			template: config.pageTemplate
@@ -79,7 +68,7 @@ class VueAdapter extends Adapter {
 		// Parse file content
 		const component = vueTemplateCompiler.parseComponent(content);
 
-		// Not a single file component (Please note: in cases with a render function the template can be missing)
+		// Not a single file component
 		if (!component.template && !component.script) {
 			return {
 				template: content
@@ -91,11 +80,19 @@ class VueAdapter extends Adapter {
 
 		if (template) {
 			// Inject template to script content
-			component.script.content = component.script.content.replace(/export default {/, `export default { template: ${JSON.stringify(template)}, __file: '${path}', `);
+			component.script.content = component.script.content.replace(/export default {/, `export default { template: ${JSON.stringify(template)}, __file: '${path}', `) // Support for object exports
+				.replace(/@Component\(?\)?\n/, '@Component({ })\n')
+				.replace(/@Component\({/, `@Component({ template: ${JSON.stringify(template)}, __file: '${path}', `); // Support for @Component usage
 		}
 
-		// Transpile ES6 to consumable script
-		return babel.transform(component.script.content, Object.assign({ filename: path }, this._babelOptions)).code;
+		const transpiledScript = typescript.transpileModule(component.script.content, {
+			compilerOptions: {
+				module: typescript.ModuleKind.CommonJS,
+				esModuleInterop: true
+			}
+		});
+
+		return transpiledScript.outputText;
 	}
 
 	clearRequireCache() {

@@ -60,7 +60,7 @@ class VueAdapter extends Adapter {
 
 		return renderer.renderToString(vm).catch(err => {
 			console.error(err);
-			return err;
+			throw err;
 		});
 	}
 
